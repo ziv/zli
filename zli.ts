@@ -11,21 +11,25 @@ if (Deno.args.length < 1) {
 
 import ip from "./commands/ip.ts";
 import help from "./commands/help.ts";
+import Display from "./display/display.ts";
 
-async function main(command: string): Promise<number> {
+async function main(command: string, inputs: string[]): Promise<number> {
+  const display = new Display();
   switch (command) {
     case "help":
-      return help();
+      return help(display.tpl);
     case "ip":
-      return ip();
+      return ip(display.tpl);
   }
+  display.error(`unknown command: ${command}`);
+  display.render();
   return UNKNOWN_COMMAND;
 }
 
 const [cmd, ...inputs] = Deno.args;
 
 try {
-  const status = await main(cmd);
+  const status = await main(cmd, inputs);
   Deno.exit(status);
 } catch (err) {
   console.error(err?.toString());
